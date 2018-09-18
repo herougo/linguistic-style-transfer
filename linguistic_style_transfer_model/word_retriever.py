@@ -86,7 +86,7 @@ def main(argv):
     parser = argparse.ArgumentParser()
     parser.add_argument("--text-file-path", type=str, required=True)
     parser.add_argument("--label-file-path", type=str, required=True)
-    parser.add_argument("--logging-level", type=str, required=True)
+    parser.add_argument("--logging-level", type=int, required=True)
     parser.parse_args(args=argv, namespace=options)
 
     global logger

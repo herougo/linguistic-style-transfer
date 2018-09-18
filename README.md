@@ -2,6 +2,8 @@
 
 Neural network model to disentangle and transfer linguistic style in text
 
+This repository is a fork of the code base from the paper entitled, "Disentangled Representation Learning for Non-Parallel Text Style Transfer". Credit for the core code goes to the authors.
+
 ---
 
 ## Prerequistites

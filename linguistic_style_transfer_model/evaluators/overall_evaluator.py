@@ -46,7 +46,7 @@ def main(argv):
     style_transfer_scores = list()
     content_preservation_scores = list()
     word_overlap_scores = list()
-    ll_scores = list()
+    #ll_scores = list()
 
     for label_index in index_label_dict:
         actual_text_file_path = os.path.join(
@@ -59,23 +59,23 @@ def main(argv):
         [content_preservation_score, word_overlap_score] = \
             content_preservation.run_content_preservation_evaluator(
                 actual_text_file_path, generated_text_file_path, options.embeddings_path)
-        ll_score = language_model_evaluator.score_generated_sentences(
-            generated_text_file_path, options.language_model_path)
+        #ll_score = language_model_evaluator.score_generated_sentences(
+        #    generated_text_file_path, options.language_model_path)
 
         style_transfer_scores.append(style_transfer_score)
         content_preservation_scores.append(content_preservation_score)
         word_overlap_scores.append(word_overlap_score)
-        ll_scores.append(ll_score)
+        #ll_scores.append(ll_score)
 
     logger.info("style_transfer_scores: {}".format(style_transfer_scores))
     logger.info("content_preservation_scores: {}".format(content_preservation_scores))
     logger.info("word_overlap_scores: {}".format(word_overlap_scores))
-    logger.info("ll_scores: {}".format(ll_scores))
+    #logger.info("ll_scores: {}".format(ll_scores))
 
     logger.info("transfer-strength: {}".format(statistics.mean(style_transfer_scores)))
     logger.info("content-preservation: {}".format(statistics.mean(content_preservation_scores)))
     logger.info("word-overlap: {}".format(statistics.mean(word_overlap_scores)))
-    logger.info("log-likelihood: {}".format(statistics.mean(ll_scores)))
+    #logger.info("log-likelihood: {}".format(statistics.mean(ll_scores)))
 
 
 if __name__ == '__main__':

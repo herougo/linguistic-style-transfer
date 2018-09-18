@@ -27,6 +27,11 @@ def train_classifier_model(options):
 
     [y, _] = data_processor.get_labels(options['label_file_path'], False)
 
+    # DEBUG
+    logger.info(f"x len: {len(x)}")
+    logger.info(f"y len: {len(y)}")
+    logger.info(str(options))
+
     shuffle_indices = np.random.permutation(np.arange(len(y)))
     x_shuffled = x[shuffle_indices]
     y_shuffled = y[shuffle_indices]

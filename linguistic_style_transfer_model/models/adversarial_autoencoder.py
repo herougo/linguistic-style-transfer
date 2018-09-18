@@ -639,6 +639,7 @@ class AdversarialAutoencoder:
         validation_style_transfer_scores = list()
         validation_content_preservation_scores = list()
         validation_word_overlap_scores = list()
+        validation_composite_losses = list()
         for i in range(num_labels):
 
             logger.info("validating label {}".format(i))
@@ -666,6 +667,7 @@ class AdversarialAutoencoder:
 
             validation_generated_sequences = list()
             validation_generated_sequence_lengths = list()
+            validation_composite_loss = 0
             for val_batch_number in range(validation_batches):
                 (start_index, end_index) = self.get_batch_indices(
                     batch_number=val_batch_number,
@@ -674,15 +676,18 @@ class AdversarialAutoencoder:
                 conditioning_embedding = np.tile(
                     A=style_embedding, reps=(end_index - start_index, 1))
 
-                [validation_generated_sequences_batch, validation_sequence_lengths_batch] = \
+                [validation_generated_sequences_batch, validation_sequence_lengths_batch, val_composite_loss_batch] = \
                     self.run_batch(
                         sess, start_index, end_index,
-                        [self.inference_output, self.final_sequence_lengths],
+                        [self.inference_output, self.final_sequence_lengths, self.composite_loss],
                         validation_sequences_to_transfer, validation_labels_to_transfer,
                         validation_sequence_lengths_to_transfer,
                         conditioning_embedding, True, 0, 0, current_epoch)
                 validation_generated_sequences.extend(validation_generated_sequences_batch)
                 validation_generated_sequence_lengths.extend(validation_sequence_lengths_batch)
+                validation_composite_loss += (end_index - start_index) * val_composite_loss_batch
+
+            validation_composite_loss /= len(validation_sequences_to_transfer)
 
             trimmed_generated_sequences = \
                 [[index for index in sequence
@@ -719,6 +724,9 @@ class AdversarialAutoencoder:
             validation_style_transfer_scores.append(style_transfer_score)
             validation_content_preservation_scores.append(content_preservation_score)
             validation_word_overlap_scores.append(word_overlap_score)
+            validation_composite_losses.append(validation_composite_loss)
+
+            logger.info("Validation Composite Loss {}: {}".format(i, validation_composite_loss))
 
         aggregate_style_transfer = np.mean(np.asarray(validation_style_transfer_scores))
         logger.info("Aggregate Style Transfer: {}".format(aggregate_style_transfer))
@@ -734,7 +742,8 @@ class AdversarialAutoencoder:
                 "epoch": current_epoch,
                 "style-transfer": aggregate_style_transfer,
                 "content-preservation": aggregate_content_preservation,
-                "word-overlap": aggregate_word_overlap
+                "word-overlap": aggregate_word_overlap,
+                "validation composite loss": np.mean(np.asarray(validation_composite_losses))
             }
             validation_scores_file.write(json.dumps(validation_record) + "\n")
 
